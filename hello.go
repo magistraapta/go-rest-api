@@ -1,54 +1,134 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
+	// "fmt"
+	"log"
 	"net/http"
+	"strconv"
+
+	sqlx "github.com/jmoiron/sqlx" //make alias name the package to sqlx
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	_ "github.com/lib/pq" //save it into underscore variable
 )
 
-type album struct {
-	ID     string  `json:id`
-	Title  string  `json:title`
-	Artist string  `json:artist`
-	Price  float64 `json:price`
+type Employee struct {
+	Id      int    `json:"id" db:"id"`
+	Name    string `json:"name" db:"name"`
+	Phone   string `json:"phone" db:"phone"`
+	Address string `json:"address" db:"address"`
 }
 
-var albums = []album{
-	{ID: "1", Title: "whats up story morning glory", Artist: "Oasis", Price: 56.99},
-	{ID: "2", Title: "for all the dogs", Artist: "Drake", Price: 100},
-	{ID: "3", Title: "menari dalam bayangan", Artist: "Hindia", Price: 60.99},
-}
-
-func getAlbums(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, albums)
-}
-
-func postAlbum(c *gin.Context) {
-	var newAlbum album
-
-	if err := c.BindJSON(&newAlbum); err != nil {
-		return
-	}
-
-	albums = append(albums, newAlbum)
-	c.IndentedJSON(http.StatusCreated, newAlbum)
-}
-
-func getAlbumById(c *gin.Context) {
-	id := c.Param("id")
-
-	for _, a := range albums {
-		if a.ID == id {
-			c.IndentedJSON(http.StatusOK, a)
-			return
-		}
-	}
+type Response struct {
+	Message string
+	Status  bool
 }
 
 func main() {
-	router := gin.Default()
-	router.GET("/albums", getAlbums)
-	router.GET("/album/:id", getAlbumById)
-	router.POST("/albums", postAlbum)
-	router.Run("localhost:8000")
+
+	db, err := sqlx.Connect("postgres", "user=postgres dbname=golang-test sslmode=disable host=localhost port=5432")
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	response := Response{
+		Message: "success executing the query",
+		Status:  true,
+	}
+
+	responseError := Response{
+		Message: "failed executing the query",
+		Status:  false,
+	}
+
+	e := echo.New()
+	e.Use(middleware.CORS())
+
+	// get all users
+	e.GET("/users", func(c echo.Context) error {
+		rows, _ := db.Queryx("select * from users")
+
+		var users []Employee
+
+		for rows.Next() {
+			place := Employee{}
+			rows.StructScan(&place)
+			users = append(users, place)
+		}
+
+		return c.JSON(http.StatusOK, users)
+	})
+
+	// get spesific user
+	e.GET("/user/:id", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+
+		user := Employee{}
+
+		err = db.Get(&user, "SELECT * FROM users WHERE id = $1", id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responseError)
+		}
+
+		return c.JSON(http.StatusOK, user)
+	})
+
+	e.POST("/users", func(c echo.Context) error {
+		reqBody := Employee{}
+		c.Bind(&reqBody)
+
+		_, err = db.NamedExec("INSERT INTO users(name, phone, address) VALUES (:name, :phone, :address)", reqBody)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responseError)
+		}
+
+		return c.JSON(http.StatusOK, response)
+	})
+
+	e.PUT("/users/update/:id", func(c echo.Context) error {
+		reqBody := Employee{}
+
+		if err := c.Bind(&reqBody); err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+
+		id, _ := strconv.Atoi(c.Param("id"))
+
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
+		}
+
+		reqBody.Id = id
+
+		_, errQuery := db.NamedExec("update users SET name= :name, phone= :phone, address= :address WHERE id= :id", reqBody)
+
+		if errQuery != nil {
+			return c.JSON(http.StatusInternalServerError, responseError)
+		}
+
+		return c.JSON(http.StatusOK, response)
+	})
+
+	e.DELETE("/users/delete/:id", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+
+		_, err = db.Exec("DELETE FROM users WHERE id = $1", id)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responseError)
+		}
+		return c.JSON(http.StatusOK, response)
+	})
+
+	// check database connection
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	} else {
+		log.Println("Successfully Connected")
+	}
+
+	//start server at port 8000
+	e.Logger.Fatal(e.Start(":8000"))
 }
