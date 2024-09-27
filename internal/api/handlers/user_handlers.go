@@ -81,4 +81,3 @@ func DeleteUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, response.SuccessResponse)
 }
 
-// Implement other user handlers (GetUser, CreateUser, UpdateUser, DeleteUser) similarly
