@@ -41,5 +41,6 @@ func SetupRoutes(e *echo.Echo) {
 	e.PUT("/post/update/:id", handlers.UpdatePost)
 	e.DELETE("/post/delete/:id", handlers.DeletePost)
 
-	e.GET("/home", handlers.HomeHandler)
+	e.GET("/", handlers.HomeHandler)
+	e.GET("/detail/:id", handlers.DetailHandler)
 }

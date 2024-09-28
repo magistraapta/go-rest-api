@@ -1,24 +1,25 @@
-<!DOCTYPE html>
+{{define "home"}}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create a new article</title>
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+</head>
 <body>
-<h1>Create a new article</h1>
-<div id="editor">
-    <p>Hello World!</p>
-    <p>Some initial <strong>bold</strong> text</p>
-    <p><br /></p>
-  </div>
+    <h1>Welcome to the Blog</h1>
+    
+    {{if .Posts}}
+        {{range .Posts}}
+            <article>
+                <h2>{{.Title}}</h2>
+                <p>{{.Content}}</p>
+                <small>Posted on: {{.CreatedAt.Format "Jan 02, 2006 at 15:04"}}</small>
+                <a href="/detail/{{.ID}}">Read more</a>
+            </article>
+        {{end}}
+    {{else}}
+        <p>No posts available.</p>
+    {{end}}
 </body>
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-
-<!-- Initialize Quill editor -->
-<script>
-  const quill = new Quill('#editor', {
-    theme: 'snow'
-  });
-</script>
 </html>
+{{end}}

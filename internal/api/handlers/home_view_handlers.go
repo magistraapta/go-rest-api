@@ -3,18 +3,28 @@ package handlers
 import (
 	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"example/hello/internal/db"
+	"example/hello/internal/models"
 )
 
 type PageData struct {
-	Title   string
-	Content string
+	Title string
+	Posts []models.Post
 }
 
 func HomeHandler(c echo.Context) error {
-	data := PageData{
-		Title:   "Home",
-		Content: "Welcome to the home page",
+	// Fetch posts from the database
+	var posts []models.Post
+	err := db.DB.Select(&posts, "SELECT id, title, content, created_at FROM posts ORDER BY created_at DESC LIMIT 10")
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Error fetching posts")
 	}
 
-	return c.Render(http.StatusOK, "home.html", data)
+	data := PageData{
+		Title: "Home",
+		Posts: posts,
+	}
+
+	return c.Render(http.StatusOK, "home", data)
 }
