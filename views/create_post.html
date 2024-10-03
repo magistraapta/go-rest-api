@@ -1,0 +1,44 @@
+{{ define "create_post"}}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post</title>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
+
+</head>
+<body>
+  <h1>Create a New Post</h1>
+  <form id="postForm" action="/posts" method="POST">
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" required><br><br>
+
+      <label for="content">Content:</label>
+      <!-- Hidden input field to store the HTML content from Quill -->
+      <input type="hidden" id="content" name="content">
+      <!-- Quill editor container -->
+      <div id="editor" style="height: 200px;">
+
+      </div><br>
+
+      <button type="submit">Create Post</button>
+  </form>
+    
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+
+<!-- Initialize Quill editor -->
+<script>
+  const quill = new Quill('#editor', {
+    theme: 'snow'
+  });
+
+  document.getElementById('postForm').addEventListener('submit', function() {
+    const content = quill.root.innerHTML; // Get HTML content from Quill
+    document.getElementById('content').value = content; // Set hidden input value
+  });
+</script>
+
+</html>
+{{end}}
