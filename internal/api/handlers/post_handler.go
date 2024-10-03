@@ -35,21 +35,15 @@ func GetPostById(c echo.Context) error {
 }
 
 func CreatePost(c echo.Context) error {
-	var post models.Post
-	err := c.Bind(&post)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, response.ErrorResponse)
-	}
 
-	// Set the current time for created_at
-	post.CreatedAt = time.Now()
-	post.UpdatedAt = time.Now()
+	title := c.FormValue("title")
+	content := c.FormValue("content")
 
-	_, err = db.DB.NamedExec("INSERT INTO posts (title, content, created_at, updated_at) VALUES (:title, :content, :created_at, :updated_at)", post)
+	_, err := db.DB.Exec("INSERT INTO posts (title, content) VALUES ($1, $2)", title, content)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusCreated, post)
+	return c.Redirect(http.StatusSeeOther, "/")
 }
 
 func UpdatePost(c echo.Context) error {
@@ -86,4 +80,8 @@ func DeletePost(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, response.SuccessResponse)
+}
+
+func RenderPostPage(c echo.Context) error {
+	return c.Render(http.StatusOK, "create_post", nil)
 }

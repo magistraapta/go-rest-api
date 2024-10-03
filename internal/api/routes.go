@@ -2,6 +2,7 @@ package api
 
 import (
 	"example/hello/internal/api/handlers"
+	"example/hello/internal/api/middleware"
 	"html/template"
 	"io"
 
@@ -21,6 +22,9 @@ func SetupRoutes(e *echo.Echo) {
 	renderer := &TemplateRenderer{
 		templates: template.Must(template.ParseGlob("../../views/*.html")),
 	}
+
+	username := "admin"
+	password := "admin"
 	e.Renderer = renderer
 
 	e.GET("/users", handlers.GetAllUsers)
@@ -36,11 +40,14 @@ func SetupRoutes(e *echo.Echo) {
 	e.DELETE("/book/delete/:id", handlers.DeleteBook)
 
 	e.GET("/posts", handlers.GetAllPosts)
-	e.POST("/posts", handlers.CreatePost)
+	e.POST("/posts", middleware.AuthMiddleware(username, password)(handlers.CreatePost))
 	e.GET("/post/:id", handlers.GetPostById)
 	e.PUT("/post/update/:id", handlers.UpdatePost)
 	e.DELETE("/post/delete/:id", handlers.DeletePost)
 
 	e.GET("/", handlers.HomeHandler)
 	e.GET("/detail/:id", handlers.DetailHandler)
+	e.GET("/create", handlers.RenderPostPage)
+	e.POST("/login", handlers.HandleLogin)
+	e.GET("/login", handlers.LoginPage)
 }

@@ -14,7 +14,6 @@ type PageData struct {
 }
 
 func HomeHandler(c echo.Context) error {
-	// Fetch posts from the database
 	var posts []models.Post
 	err := db.DB.Select(&posts, "SELECT id, title, content, created_at FROM posts ORDER BY created_at DESC LIMIT 10")
 	if err != nil {
