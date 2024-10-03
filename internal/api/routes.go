@@ -22,8 +22,6 @@ func SetupRoutes(e *echo.Echo) {
 		templates: template.Must(template.ParseGlob("../../views/*.html")),
 	}
 
-	// username := "admin"
-	// password := "admin"
 	e.Renderer = renderer
 
 	e.GET("/users", handlers.GetAllUsers)
@@ -43,4 +41,7 @@ func SetupRoutes(e *echo.Echo) {
 	e.GET("/create", handlers.RenderPostPage)
 	e.POST("/login", handlers.HandleLogin)
 	e.GET("/login", handlers.LoginPage)
+	e.GET("/dashboard", handlers.DashboardViewHandler)
+	e.GET("/register", handlers.RegisterViewHandler)
+	e.POST("/register", handlers.RegisterHandler)
 }
