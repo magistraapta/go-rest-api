@@ -8,7 +8,17 @@
 <body>
 
     <div>
-        <h1>Dashboard</h1>
+        <h1>{{.Title}}</h1>
+        {{if .Users}}
+            {{range .Users}}
+                <div>
+                    <p>{{.Username}}</p>
+                    <small>Posted on: {{.CreatedAt.Format "Jan 02, 2006 at 15:04"}}</small>
+                </div>
+            {{end}}
+        {{else}}
+            <p>No posts available.</p>
+        {{end}}
         <div>
             <button>Create User</button>
         </div>
