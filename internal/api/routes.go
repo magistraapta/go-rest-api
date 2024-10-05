@@ -2,6 +2,7 @@ package api
 
 import (
 	"example/hello/internal/api/handlers"
+	"example/hello/internal/api/middleware"
 	"html/template"
 	"io"
 
@@ -37,7 +38,7 @@ func SetupRoutes(e *echo.Echo) {
 	e.DELETE("/post/delete/:id", handlers.DeletePost)
 
 	e.GET("/", handlers.HomeHandler)
-	e.GET("/detail/:id", handlers.DetailHandler)
+	e.GET("/detail/:id", handlers.DetailHandler, middleware.AuthMiddleware)
 	e.GET("/create", handlers.RenderPostPage)
 	e.POST("/login", handlers.HandleLogin)
 	e.GET("/login", handlers.LoginPage)

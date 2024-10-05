@@ -18,20 +18,27 @@ func HandleLogin(c echo.Context) error {
 	password := c.FormValue("password")
 
 	var user models.User
-	err := db.DB.QueryRow("SELECT username, password FROM users WHERE username = $1", username).Scan(&user.Username, &user.Password)
+	errDb := db.DB.QueryRow("SELECT username, password FROM users WHERE username = $1", username).Scan(&user.Username, &user.Password)
 
-	if err != nil {
-		// Any other database error
+	tokenString, expirationTime, errToken := CreateToken(user.Username)
+	if errDb != nil {
 		return c.String(http.StatusInternalServerError, "Error querying the database")
 	}
 
-	// Compare the provided password with the hashed password in the database
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil {
-		// If the password doesn't match
+	if errToken != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Could not generate token")
+	}
+
+	errHash := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if errHash != nil {
 		return c.String(http.StatusUnauthorized, "Invalid username or password")
 	}
 
-	// If the login is successful, redirect to home page
+	c.SetCookie(&http.Cookie{
+		Name:    "Token",
+		Value:   tokenString,
+		Expires: expirationTime,
+	})
+
 	return c.Redirect(http.StatusSeeOther, "/")
 }
