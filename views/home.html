@@ -4,22 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Title}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <h1>Welcome to the Blog</h1>
+    <div class=" grid grid-cols-1 ml-[48px]">
+        <h1 class=" text-[48px] font-bold">Welcome to my Blog</h1>
     
-    {{if .Posts}}
-        {{range .Posts}}
-            <article>
-                <h2>{{.Title}}</h2>
-                <p>{{slice .Content 0 10}}</p> <!-- Limit content to 255 characters -->
-                <small>Posted on: {{.CreatedAt.Format "Jan 02, 2006 at 15:04"}}</small>
-                <a href="/detail/{{.ID}}">Read more</a>
-            </article>
-        {{end}}
-    {{else}}
-        <p>No posts available.</p>
-    {{end}}
+        <div class="grid grid-cols-3 gap-4 mt-[32px] ">
+            {{if .Posts}}
+                {{range .Posts}}
+                    <article>
+                        <h2 class="text-[24px] font-bold">{{.Title}}</h2>
+                        <p>{{slice .Content 0 10}}</p> <!-- Limit content to 255 characters -->
+                        <small>Posted on: {{.CreatedAt.Format "Jan 02, 2006 at 15:04"}}</small>
+                        <p class="text-blue-400 text-underlined">
+                            <a href="/detail/{{.ID}}">Read more</a>
+                        </p>
+                        
+                    </article>
+                {{end}}
+            {{else}}
+                <p>No posts available.</p>
+            {{end}}
+        </div>
+    </div>
+    
+    
 </body>
 </html>
 {{end}}
