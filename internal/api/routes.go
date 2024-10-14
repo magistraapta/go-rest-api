@@ -38,7 +38,7 @@ func SetupRoutes(e *echo.Echo) {
 	e.DELETE("/post/delete/:id", handlers.DeletePost)
 
 	e.GET("/", handlers.HomeHandler)
-	e.GET("/detail/:id", handlers.DetailHandler, middleware.AuthMiddleware)
+	e.GET("/detail/:id", handlers.DetailHandler)
 	e.GET("/create", handlers.RenderPostPage, middleware.AuthMiddleware)
 	e.POST("/login", handlers.HandleLogin)
 	e.GET("/login", handlers.LoginPage)
