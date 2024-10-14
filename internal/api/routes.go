@@ -39,7 +39,7 @@ func SetupRoutes(e *echo.Echo) {
 
 	e.GET("/", handlers.HomeHandler)
 	e.GET("/detail/:id", handlers.DetailHandler, middleware.AuthMiddleware)
-	e.GET("/create", handlers.RenderPostPage)
+	e.GET("/create", handlers.RenderPostPage, middleware.AuthMiddleware)
 	e.POST("/login", handlers.HandleLogin)
 	e.GET("/login", handlers.LoginPage)
 	e.GET("/dashboard", handlers.DashboardViewHandler, middleware.AuthMiddleware)
