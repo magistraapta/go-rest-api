@@ -10,26 +10,78 @@
 </head>
 <body>
 
-    <div class="m-5">
-        <h1>{{.Title}}</h1>
-        {{if .Users}}
-            {{range .Users}}
-                <div>
-                    <p>{{.Username}}</p>
-                    <small>Posted on: {{.CreatedAt.Format "Jan 02, 2006 at 15:04"}}</small>
-                </div>
-            {{end}}
-        {{else}}
-            <p>No posts available.</p>
-        {{end}}
-        <div class="mt-5">
-            <button type="button" class="btn btn-primary">Create User</button>
-            <button type="button" class="btn btn-primary">
-                <a href="/create">
-                    Create Article
-                </a>
-            </button>
+    <div class="m-5 container">
+        
+
+        <h1 class="fs-1">Dashboard</h1>
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-primary">Create User</button>
+                <a href="/create" class="btn btn-warning">Create Article</a>
+            </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-10">
+                {{if .Posts}}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Title</th>
+                                <th scope="col">Date Posted</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range .Posts}}
+                                <tr>
+                                    <td>{{.Title}}</td>
+                                    <td>{{.CreatedAt.Format "Jan 02, 2006 at 15:04"}}</td>
+                                    <td>
+                                        <a href="/edit/" class="btn btn-primary btn-sm">Edit</a>
+                                        <a href="/delete/" class="btn btn-danger btn-sm">Delete</a>
+                                    </td>
+                                </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                {{else}}
+                    <p class="text-center">No posts available.</p>
+                {{end}}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10">
+                {{if .Users}}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Date Created</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range .Users}}
+                                <tr>
+                                    <td>{{.Username}}</td>
+                                    <td>{{.CreatedAt.Format "Jan 02, 2006 at 15:04"}}</td>
+                                    <td>
+                                        <a href="/edit/" class="btn btn-primary btn-sm">Edit</a>
+                                        <a href="/delete/" class="btn btn-danger btn-sm">Delete</a>
+                                    </td>
+                                </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                {{else}}
+                    <p class="text-center">No posts available.</p>
+                {{end}}
+            </div>
+        </div>
+
+        
     </div>
     
 </body>
